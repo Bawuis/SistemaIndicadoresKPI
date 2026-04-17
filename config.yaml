@@ -1,0 +1,41 @@
+# Configuración del Pipeline ETL
+pipeline:
+  nombre: "ETL_Consolidacion_Metricas"
+  version: "1.0.0"
+  autor: "SistemaIndicadoresKPI"
+
+rutas:
+  input:      "./input"
+  processing: "./processing"
+  output:     "./output"
+  archive:    "./archive"
+  logs:       "./logs"
+  error:      "./error"
+
+archivos_esperados:
+  - nombre: "source_A.xlsx"
+    columnas_requeridas:
+      - "ID_Operacion"
+      - "Fecha"
+      - "Unidad"
+      - "Valor_Real"
+      - "Responsable"
+  - nombre: "source_B.xlsx"
+    columnas_requeridas:
+      - "ID_Operacion"
+      - "Periodo"
+      - "Valor_Meta"
+      - "Categoria"
+      - "Estado"
+
+join:
+  llave_primaria: "ID_Operacion"
+  tipo: "left"
+
+metricas:
+  cumplimiento_optimo: 90
+  cumplimiento_en_riesgo: 70
+
+monitoreo:
+  intervalo_segundos: 60
+  notificacion_email: "equipo@empresa.com"
