@@ -20,12 +20,12 @@ pipeline:
 ### Seccion rutas
 ```yaml
 rutas:
-  input:      "./input"
-  processing: "./processing"
-  output:     "./output"
-  archive:    "./archive"
-  logs:       "./logs"
-  error:      "./error"
+  input:      "./data/input"
+  processing: "./data/processing"
+  output:     "./data/output"
+  archive:    "./data/archive"
+  logs:       "./data/logs"
+  error:      "./data/error"
 ```
 Todas las rutas pueden ser relativas (desarrollo) o absolutas (produccion).
 

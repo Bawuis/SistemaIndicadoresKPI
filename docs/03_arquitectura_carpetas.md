@@ -1,55 +1,60 @@
-# Arquitectura de Carpetas — SistemaIndicadoresKPI
+# Arquitectura de Carpetas Recomendada - SistemaIndicadoresKPI
 
-## Estructura Completa
+## Ubicacion Base
+
+Ruta base solicitada:
+
+`C:/Users/carlo/OneDrive/Desktop/kpi`
+
+## Estructura Recomendada
 
 ```
-SistemaIndicadoresKPI/
-|-- main.py
-|-- config.yaml
-|-- requirements.txt
-|-- src/
-|   |-- config_loader.py
-|   |-- monitor.py
-|   |-- extractor.py
-|   |-- transformador.py
-|   |-- calculador_metricas.py
-|   |-- generador_reporte.py
-|   `-- pipeline.py
-|-- docs/
-|   |-- 01_documentacion_funcional.md
-|   |-- 02_diagrama_flujo.md
-|   `-- 03_arquitectura_carpetas.md
-|-- input/       # ZONA DE CARGA
-|-- processing/  # ZONA TEMPORAL
-|-- output/      # REPORTES GENERADOS
-|-- archive/     # HISTORICO
-|-- logs/        # TRAZABILIDAD
-`-- error/       # FALLOS
+kpi/
+`-- SistemaIndicadoresKPI/
+	|-- main.py
+	|-- config.yaml
+	|-- requirements.txt
+	|-- README.md
+	|-- src/
+	|   |-- __init__.py
+	|   |-- config_loader.py
+	|   |-- extractor.py
+	|   |-- transformador.py
+	|   |-- calculador_metricas.py
+	|   |-- generador_reporte.py
+	|   |-- pipeline.py
+	|   `-- monitor.py
+	|-- docs/
+	|   |-- 01_documentacion_funcional.md
+	|   |-- 02_diagrama_flujo.md
+	|   |-- 03_arquitectura_carpetas.md
+	|   |-- 04_diccionario_datos.md
+	|   |-- 05_guia_configuracion.md
+	|   |-- 06_manejo_errores.md
+	|   `-- 07_guia_despliegue.md
+	`-- data/
+		|-- input/       # Aqui colocas los 2 Excel de entrada
+		|-- processing/  # Espacio temporal del proceso
+		|-- output/      # Reportes Excel generados
+		|-- archive/     # Historial de fuentes procesadas por fecha
+		|-- logs/        # Logs diarios del proceso ETL
+		`-- error/       # Archivos con validacion fallida
 ```
 
-## Descripcion por Zona
+## Reglas Operativas
 
-| Carpeta | Rol | Acceso |
-|---|---|---|
-| /input | Zona de carga, monitoreada en tiempo real | Usuario |
-| /processing | Zona temporal durante el procesamiento | Sistema |
-| /output | Reportes finales listos para consumo | Usuario |
-| /archive | Historico inmutable, organizado por fecha YYYY-MM-DD | Solo lectura |
-| /logs | Trazabilidad completa, rotacion diaria 30 dias | Administrador |
-| /error | Archivos que fallaron validacion, requieren revision manual | Administrador |
-
-## Reglas
-1. /input es la unica carpeta donde el usuario deposita archivos.
-2. /output nunca se modifica manualmente.
-3. /archive se organiza por fecha YYYY-MM-DD.
-4. /error requiere intervencion manual.
-5. Los logs rotan diariamente y se retienen 30 dias.
+1. Solo se cargan archivos en `data/input`.
+2. Los archivos de entrada deben llamarse `source_A.xlsx` y `source_B.xlsx`.
+3. El proceso genera reporte en `data/output` y luego mueve fuentes a `data/archive`.
+4. Si falta esquema o hay error de lectura, el archivo se mueve a `data/error`.
+5. Los logs se guardan en `data/logs` con rotacion diaria.
 
 ## Convenciones de Nombres
 
 | Tipo | Patron | Ejemplo |
 |---|---|---|
-| Fuente | source_{letra}.xlsx | source_A.xlsx |
-| Reporte | output_reporte_{YYYYMMDD}_{HHMMSS}.xlsx | output_reporte_20260417_143022.xlsx |
-| Archivado | {nombre}_{YYYYMMDD}_{HHMMSS}.xlsx | source_A_20260417_143022.xlsx |
-| Log | etl_{YYYY-MM-DD}.log | etl_2026-04-17.log |
+| Entrada A | source_A.xlsx | source_A.xlsx |
+| Entrada B | source_B.xlsx | source_B.xlsx |
+| Reporte | output_reporte_YYYYMMDD_HHMMSS.xlsx | output_reporte_20260422_101500.xlsx |
+| Archivado | nombre_YYYYMMDD_HHMMSS.xlsx | source_A_20260422_101500.xlsx |
+| Log | etl_YYYY-MM-DD.log | etl_2026-04-22.log |
