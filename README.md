@@ -48,7 +48,7 @@ Columnas obligatorias:
 - `ID_Operacion`
 - `Periodo`
 - `Valor_Meta`
-- `Categoria`
+- `Categoria`   
 - `Estado`
 
 Importante:
