@@ -5,6 +5,7 @@ Descripcion: Monitor de carpeta de entrada (Event-Driven) usando watchdog.
 
 import os
 import time
+import unicodedata
 from loguru import logger
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
@@ -18,18 +19,38 @@ class MonitorCarpeta(FileSystemEventHandler):
         super().__init__()
         self.config = config
         self.ruta_input = config["rutas"]["input"]
-        self.archivos_esperados = [a["nombre"] for a in config["archivos_esperados"]]
+        cfg_excel = config.get("consolidacion_excel", {})
+        self.keywords = [
+            cfg_excel.get("keyword_elearning", "elearning"),
+            cfg_excel.get("keyword_files_jmc", "filesjmc"),
+            cfg_excel.get("keyword_participantes", "participantes"),
+        ]
+
+    @staticmethod
+    def _normalizar(nombre: str) -> str:
+        texto = str(nombre).strip().lower()
+        texto = "".join(c for c in unicodedata.normalize("NFD", texto) if unicodedata.category(c) != "Mn")
+        return "".join(c for c in texto if c.isalnum())
 
     def _intentar_ejecucion(self) -> None:
-        archivos_presentes = os.listdir(self.ruta_input)
-        todos_presentes = all(a in archivos_presentes for a in self.archivos_esperados)
+        archivos_presentes = [
+            f for f in os.listdir(self.ruta_input) if not f.startswith("~$") and f.lower().endswith((".xlsx", ".xlsm", ".xls"))
+        ]
+        archivos_norm = [self._normalizar(f) for f in archivos_presentes]
+
+        faltantes = []
+        for kw in self.keywords:
+            kw_norm = self._normalizar(kw)
+            if not any(kw_norm in nombre for nombre in archivos_norm):
+                faltantes.append(kw)
+
+        todos_presentes = len(faltantes) == 0
 
         if todos_presentes:
             logger.success("Todos los archivos detectados. Disparando pipeline ETL...")
             ejecutar_pipeline(self.config)
         else:
-            faltantes = [a for a in self.archivos_esperados if a not in archivos_presentes]
-            logger.warning(f"Esperando archivos faltantes: {faltantes}")
+            logger.warning(f"Esperando archivos faltantes por keyword: {faltantes}")
 
     def on_created(self, event):
         if event.is_directory:

@@ -6,11 +6,26 @@ pipeline:
 
 rutas:
   input:      "./data/input"
+  input_secundario: "./data/input_secundario"
   processing: "./data/processing"
   output:     "./data/output"
+  output_secundario: "./data/output_secundario"
   archive:    "./data/archive"
   logs:       "./data/logs"
   error:      "./data/error"
+  plantillas: "./data/plantillas"
+
+consolidacion_excel:
+  keyword_elearning: "elearning"
+  keyword_files_jmc: "filesjmc"
+  keyword_participantes: "participantes"
+  keyword_plantilla: "calculo horas 2026"
+  hoja_destino: "CONSOLIDADO"
+
+proceso_secundario:
+  habilitado: true
+  keyword_archivo_destino: "horas entrenamiento 2026"
+  hoja_destino: "Reporte horas"
 
 archivos_esperados:
   - nombre: "source_A.xlsx"
